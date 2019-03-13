@@ -5,8 +5,8 @@ var qrpc = require("qrpc-over-ws");
 var conf = new qrpc.Config()
 conf.setDialTimeout(1000);
 
-var addr="localhost";
-var conn = new qrpc.Connection("ws://"+addr+":8901/qrpc", conf, function(conn, frame){
+var addr="ws://localhost:8901/qrpc";
+var conn = new qrpc.Connection(addr, conf, function(conn, frame){
 	console.log("pushed", frame);
 }, function(conn) {
 	console.log("closed");
