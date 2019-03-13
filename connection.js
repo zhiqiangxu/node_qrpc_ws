@@ -29,27 +29,26 @@ method.connect = function() {
     });
     ws.binaryType = 'arraybuffer';
 
-    var self = this;
-    ws.onclose = function(ev) {
+    ws.onclose = (ev) => {
         console.log("onclose", ev);
-        if (self._closecb) self._closecb(self);
+        if (this._closecb) this._closecb(this, ev);
     };
-    ws.onopen = function(ev) {
-        self._ws = ws;
+    ws.onopen = (ev) => {
+        this._ws = ws;
         openc.complete(ev);
         openc = null;
     }
-    ws.onerror = function(ev) {
+    ws.onerror = (ev) => {
         console.log("onerror closing", ev, "readyState", ws.readyState);
         if (openc) {
             openc.completeError("connect failed");
             openc = null;
         } else {
-            self.close();
+            this.close();
         }
         
     };
-    ws.onmessage = function(ev) {
+    ws.onmessage = (ev) => {
         console.log("onmessage", ev);
         if (typeof ev.data === "string") {
             console.log("ignored string data:", ev.data);
@@ -57,25 +56,25 @@ method.connect = function() {
         }
         if (!reader.add(new Uint8Array(ev.data))) {
             console.log("reader.add fail, close");
-            self.close();
+            this.close();
         }
 
         while (true) {
             var frame = reader.take();
             if (!frame) break;
             if (frame.isPushed()) {
-                if (self._sub != null) {
-                    self._sub(self, frame);
+                if (this._sub != null) {
+                    this._sub(this, frame);
                 } else {
                     console.log("no sub, pushed msg ignored");
                 }
                 continue;
             }
-            if (frame.requestID in self._respes) {
-                self._respes[frame.requestID].complete(frame);
-                delete self._respes[frame.requestID];
+            if (frame.requestID in this._respes) {
+                this._respes[frame.requestID].complete(frame);
+                delete this._respes[frame.requestID];
             } else {
-                console.log("dangling frame ignored", frame, "respes", self._respes);
+                console.log("dangling frame ignored", frame, "respes", this._respes);
             }
         }
     };

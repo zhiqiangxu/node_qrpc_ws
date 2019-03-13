@@ -1,17 +1,15 @@
 function Completer(timeout) {
-    var self = this;
     this._promise = new Promise((resolve, reject) => {
-        self._resolve = resolve;
-        self._reject = reject;
+        this._resolve = resolve;
+        this._reject = reject;
     });
     if (timeout > 0) {
         this._id = window.setTimeout(() => {
-            self._reject("timeout");
+            this._reject("timeout");
         });
     }
     
 }
-
 
 var method = Completer.prototype;
 
@@ -19,19 +17,19 @@ method.getPromise = function() {
     return this._promise;
 }
 
-method._onComplete = () => {
+method._onComplete = function() {
     if (this._id) {
         window.clearTimeout(this._id);
         this._id = null;
     }
 }
 
-method.complete = (data) => {
+method.complete = function(data) {
     this._resolve(data);
     this._onComplete();
 }
 
-method.completeError = (reason) => {
+method.completeError = function(reason) {
     this._reject(reason);
     this._onComplete();
 }
