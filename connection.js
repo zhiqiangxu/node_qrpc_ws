@@ -37,11 +37,17 @@ method.connect = function() {
     ws.onopen = function(ev) {
         self._ws = ws;
         openc.complete(ev);
+        openc = null;
     }
     ws.onerror = function(ev) {
         console.log("onerror closing", ev, "readyState", ws.readyState);
-        if (ws.readyState == 0) openc.completeError("connect failed");
-        self.close();
+        if (openc) {
+            openc.completeError("connect failed");
+            openc = null;
+        } else {
+            self.close();
+        }
+        
     };
     ws.onmessage = function(ev) {
         console.log("onmessage", ev);
@@ -77,7 +83,7 @@ method.connect = function() {
     return openc.getPromise();
 }
 
-method.request = function(cmd, flags, payload) {
+method.request = function(cmd, flags, payload, timeout) {
     if (typeof payload == "string") payload = new TextEncoder("utf-8").encode(payload);
 
     if (!this._ws) return Promise.reject("not connected");
@@ -88,7 +94,7 @@ method.request = function(cmd, flags, payload) {
         requestID = this._requestID();
         if (!(requestID in this._respes)) {
             ok = true;
-            this._respes[requestID] = new Completer();
+            this._respes[requestID] = new Completer(timeout ? timeout : this._conf.getRequestTimeout());
             break;
         }
     }
