@@ -19,8 +19,8 @@ var loginRequest = {"app":"app","uid":"cs1","device":"mac","token":"cs"};
 var payload = JSON.stringify(loginRequest);
 conn.connect().then(function(ev) {
 	return conn.request(cmd, flags, payload);
-}).then(function(data){
-	console.log("login data", data);
+}).then(function(frame){
+	console.log("login data", new TextDecoder('utf-8').decode(frame.payload));
 }).catch(function(error){
 	console.log("error", error);
 });

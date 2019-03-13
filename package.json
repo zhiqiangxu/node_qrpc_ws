@@ -1,6 +1,6 @@
 {
   "name": "qrpc-over-ws",
-  "version": "1.0.34",
+  "version": "1.0.35",
   "description": "qrpc over websocket for js",
   "main": "index.js",
   "scripts": {
