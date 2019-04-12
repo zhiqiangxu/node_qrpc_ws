@@ -6,7 +6,7 @@ function Completer(timeout) {
     if (timeout > 0) {
         this._id = window.setTimeout(() => {
             this._reject("timeout");
-        });
+        }, timeout);
     }
     
 }
